@@ -16,6 +16,8 @@ import javax.persistence.Lob;
 import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.picketlink.common.util.Base64;
 
 /**
@@ -68,6 +70,8 @@ public class Image implements Serializable {
         this.posted = posted;
     }
 
+    @Transient
+    @JsonIgnore
     public String getImageBase64() {
         if (imageData != null) {
             return Base64.encodeBytes(imageData);

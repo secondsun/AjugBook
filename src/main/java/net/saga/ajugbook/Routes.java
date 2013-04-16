@@ -29,6 +29,8 @@ import org.jboss.aerogear.controller.view.JspViewResponder;
  */
 public class Routes extends AbstractRoutingModule {
 
+    public static final MediaType CUSTOM_MEDIA_TYPE = new MediaType(MediaType.JSON.getType(), CustomMediaTypeResponder.class);
+    
     @Override
     public void configuration() throws Exception {
 
@@ -42,10 +44,7 @@ public class Routes extends AbstractRoutingModule {
                 .on(AeroGearSecurityException.class)
                 .produces(JSP, JSON)
                 .to(Error.class).security(param(RuntimeException.class));
-        /*
-         * This error route is only for demo purposes and we do not recommend a production system
-         * to provide this much information, as it could be used by an attacker. 
-         */
+        
         route()
                 .on(UnexpectedCredentialException.class)
                 .produces(JSP)
@@ -56,9 +55,18 @@ public class Routes extends AbstractRoutingModule {
                 .produces(JSP, JSON)
                 .to(Error.class).index(param(Exception.class));
 
-        route().from("/").on(RequestMethod.GET).consumes(MediaType.ANY).produces(JSP).to(IndexController.class).index();
+        route().from("/")
+                .on(RequestMethod.GET)
+                .consumes(MediaType.ANY)
+                .produces(JSP)
+                .to(IndexController.class).index();
+        
         route().from("/login").on(RequestMethod.GET).consumes(MediaType.ANY).produces(JSP).to(LoginController.class).index();
-        route().from("/login").on(RequestMethod.POST).consumes(MediaType.ANY).produces(JSP).to(LoginController.class).login(param(AeroGearUser.class));
+        route().from("/login")
+                .on(RequestMethod.POST)
+                .consumes(MediaType.ANY)
+                .produces(JSP)
+                .to(LoginController.class).login(param(AeroGearUser.class));
         route()
                 .from("/logout")
                 .on(RequestMethod.GET)
@@ -74,16 +82,67 @@ public class Routes extends AbstractRoutingModule {
                 .consumes(JSP)
                 .to(LoginController.class).register(param(AeroGearUser.class));
 
-        route().from("/post").on(RequestMethod.GET).consumes(MediaType.ANY).produces(MediaType.JSP).to(PostController.class).index();
+        route().from("/post")
+               .on(RequestMethod.GET)
+               .consumes(MediaType.HTML, MediaType.JSP)
+               .produces(MediaType.JSP).to(PostController.class).index();
         
-        route().from("/post").on(RequestMethod.POST).consumes(MULTIPART).produces(MediaType.JSP).to(PostController.class).post(param(Post.class));
+        route().from("/post")
+               .roles("logged_in")
+               .on(RequestMethod.POST)
+               .consumes(MULTIPART)
+               .produces(MediaType.JSP)
+               .to(PostController.class).post(param(Post.class));
         
+        route().from("/account")
+               .on(RequestMethod.GET)
+               .consumes(MediaType.ANY)
+               .produces(MediaType.JSP, MediaType.JSON).to(AccountController.class).index();
         
-        route().from("/account").on(RequestMethod.GET).consumes(MediaType.ANY).produces(MediaType.JSP).to(AccountController.class).index();
-        
-        route().from("/updatePhoto").on(RequestMethod.POST).consumes(MULTIPART).produces(MediaType.JSP).to(AccountController.class).updatePhoto(param(Account.class));
+        route().from("/updatePhoto").roles("logged_in").on(RequestMethod.POST).consumes(MULTIPART).produces(MediaType.JSP).to(AccountController.class).updatePhoto(param(Account.class));
         
         route().from("/photos").on(RequestMethod.GET).consumes(MediaType.ANY).produces(MediaType.JSP).to(PhotoController.class).index();
         
+        //Client Route configs
+        route().from("/post")
+               .on(RequestMethod.GET)
+               .consumes(MediaType.JSON)
+               .produces(MediaType.JSON)
+               .to(PostController.class).getAll();
+        
+         route()
+                .from("/post")
+                .roles("logged_in")
+                .on(RequestMethod.POST)
+                .consumes(JSON)
+                .produces(MediaType.JSON)
+                .to(PostController.class).post(param(Post.class));
+        route()
+                .from("/post/{id}")
+                .roles("logged_in")
+                .on(RequestMethod.DELETE)
+                .consumes(JSON)
+                .produces(MediaType.JSON)
+                .to(PostController.class).deleteById(param("id"));
+        
+        route()
+                .from("/auth/login")
+                .on(RequestMethod.POST)
+                .consumes(MediaType.JSON)
+                .produces(CUSTOM_MEDIA_TYPE)
+                .to(LoginController.class).login(param(AeroGearUser.class));
+        route()
+                .from("/auth/logout")
+                .on(RequestMethod.POST)
+                .consumes(JSON)
+                .produces(JSON)
+                .to(LoginController.class).logout();
+        route()
+                .from("/auth/enroll")
+                .on(RequestMethod.POST)
+                .consumes(JSON)
+                .produces(CUSTOM_MEDIA_TYPE)
+                .to(LoginController.class).register(param(AeroGearUser.class));
+
     }
 }

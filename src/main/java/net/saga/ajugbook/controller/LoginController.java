@@ -7,13 +7,16 @@ package net.saga.ajugbook.controller;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.ejb.TransactionManagement;
+import javax.enterprise.event.Event;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
+import net.saga.ajugbook.util.ResponseHeaders;
 import net.saga.ajugbook.vo.Account;
 import org.jboss.aerogear.security.auth.AuthenticationManager;
+import org.jboss.aerogear.security.auth.Token;
 import org.jboss.aerogear.security.authz.IdentityManagement;
 import org.jboss.aerogear.security.model.AeroGearUser;
 
@@ -34,6 +37,15 @@ public class LoginController {
     @Inject
     private IdentityManagement configuration;
 
+    @Inject
+    Event<ResponseHeaders> headers;
+
+    @Inject
+    @Token
+    private Instance<String> token;
+
+    
+    
     public void index() {
     }
 
@@ -62,7 +74,7 @@ public class LoginController {
     }
 
     private void fireResponseHeaderEvent() {
-        //headers.fire(new ResponseHeaders(AUTH_TOKEN, token.get().toString()));
+        headers.fire(new ResponseHeaders(AUTH_TOKEN, token.get().toString()));
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
