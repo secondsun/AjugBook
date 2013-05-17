@@ -19,7 +19,7 @@
   <persistence-unit name="ajugBook" transaction-type="JTA">
     <description>Persistence Unit</description>
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
-    <jta-data-source>java:/ajugBook</jta-data-source>
+    <jta-data-source>java:jboss/datasources/MysqlDS</jta-data-source>
     <class>net.saga.ajugbook.vo.Image</class>
     <class>net.saga.ajugbook.vo.Account</class>
     <class>net.saga.ajugbook.vo.Post</class>
@@ -34,7 +34,7 @@
   <persistence-unit name="picketlink-default" transaction-type="JTA">
     <description>PicketLink Persistence Unit</description>
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
-    <jta-data-source>java:/ajugBook</jta-data-source>
+    <jta-data-source>java:jboss/datasources/MysqlDS</jta-data-source>
     <class>org.picketlink.idm.jpa.schema.IdentityObject</class>
     <class>org.picketlink.idm.jpa.schema.PartitionObject</class>
     <class>org.picketlink.idm.jpa.schema.RelationshipObject</class>
